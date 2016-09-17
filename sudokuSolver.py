@@ -39,8 +39,8 @@ def count_matrix(m):
 '''
             
 def write_to_cnf_file(cnf, name): # out is the writting channel
-    out = open(name + '.cnf' , 'w+')
-    out.write("c created by Robert for iLogic course and final year project. \nc Supervisor: Dr. Konstantin Korovin")
+    out = open(name, 'w+')
+    # out.write("c created by Robert for iLogic course and final year project. \nc Supervisor: Dr. Konstantin Korovin")
     #out.write() we can forget about the number of clauses and number of variables although it is good to know.
     #print "data is", repr(cnf)
     
