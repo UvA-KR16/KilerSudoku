@@ -140,15 +140,15 @@ def encode_to_cnf(matrix): #encode a problem (stored in matrix) as cnf
                         cnf.append([-1*(code(index1%3+(block_i*3), index1/3+(block_j*3),k)), 
                                     -1*code(index2%3+(block_i*3), index2/3+(block_j*3),k)])#
                 
-    '''               
+    # '''               
     #some numbers are prefilled
     for i in range(9):
         for j in range(9):
             if matrix[i][j] != 0:
                 #print i, j, matrix[i][j], code(i,j, matrix[i][j])
                 #output.write(str(code(i,j, matrix[i][j])) + ' 0\n')
-                cnf.append([code(i,j,matrix[i][j])])
-    '''
+                cnf.append([code(i,j,matrix[i][j] -1)])
+    # '''
     return cnf
 
 
