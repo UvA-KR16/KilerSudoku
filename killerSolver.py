@@ -9,9 +9,9 @@ import pycosat
 from itertools import combinations, ifilter, chain
 
 # some global values:
-cellPossibleValues = [[range(1,10)] * 9]  *9
+# cellPossibleValues = [[range(1,10)] * 9]  *9
 seed = 10000
-indexBoard = [[[0] * 9] * 9] * 9
+indexBoard = []
 
 def getNewIndex():
     global seed
@@ -30,10 +30,6 @@ def deIndex (index):
     k = (index-1) % 9 +1 
     return (i, j, k)  # k is 1 - 9
 
-for i in range (0, 9):
-    for j in range (0, 9):
-        for num in range (1, 10): # here, it represent num of 1 to 9
-            indexBoard[i][j][num-1] = getIndex(i, j, num)
 
 def decode_to_matrix(result_list):
     out_matrix = numpy.zeros(shape = (9,9))
@@ -62,7 +58,7 @@ def write_to_cnf_file(cnf, name): # out is the writting channel
     #print "data is", repr(cnf)
     
     for clause in cnf:
-        print 'A Clause is: ', clause
+        # print 'A Clause is: ', clause
         for literal in clause:
             #print literal
             out.write(str(literal)+' ')
@@ -82,6 +78,18 @@ def add_cell_values(i, j, v):
 
 
 def encode_to_cnf(killerRules): #encode a problem (stored in matrix) as cnf
+    global indexBoard
+    for i in range (0, 9):
+        tmp = []
+        for j in range (0, 9):
+            tmp2 = []
+            for num in range (1, 10): # here, it represent num of 1 to 9
+                tmp2.append(getIndex(i, j, num))
+            tmp.append(tmp2)
+        indexBoard.append(tmp)
+
+    print indexBoard
+
     cnf = []
     
     # find all possible combination of each cell
@@ -123,10 +131,17 @@ def encode_to_cnf(killerRules): #encode a problem (stored in matrix) as cnf
         # for every common value, [1,2] for example, introduce a new index representing the existence of the value
         # among the cells of the cage. 
 
+        dic = {}
+        for nums in range(1, 10): 
+            dic[nums] = getNewIndex()
+
         for num in common:
-            numIndex = getNewIndex()
+            tmp = []
             for cc in cageCells:
-                cnf.append([-1* indexBoard[cc[0]][cc[1]][num-1], numIndex]) # if the number appears in one of the cells, then it makes the 
+                tmp.append(indexBoard[cc[0]][cc[1]][num-1])
+            print 'common value ', num, ' encoded as ', tmp 
+            cnf.append(tmp)
+                # cnf.append([-1* indexBoard[cc[0]][cc[1]][num-1], numIndex]) # if the number appears in one of the cells, then it makes the 
                                                                      # newly introduced literal true
 
         # next, we encode the differnt ones 
@@ -135,9 +150,6 @@ def encode_to_cnf(killerRules): #encode a problem (stored in matrix) as cnf
         # lst = reduce ((lambda x, y: x + y), different)
         # lst = list(set(lst)) # remove duplicated elements
 
-        dic = {}
-        for nums in range(1, 10): 
-            dic[nums] = getNewIndex()
         x_list = []
         for dif in different: # for example, [[3,4,8], [3,5,7], [4,5,6]
             # for cc in cageCells:
