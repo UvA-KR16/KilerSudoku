@@ -38,7 +38,9 @@ def decode_to_matrix(result_list):
             #print l ,'means', (l-1)/81,((l-1)/9)%9,' is ', (l-1)%9 +1 
             (i,j,k) = deIndex(l)
             out_matrix[i][j] = k
-            
+        # elif l > 10000:
+            # print l
+
     return out_matrix
             
 def print_matrix(matrix):
@@ -88,7 +90,7 @@ def encode_to_cnf(killerRules): #encode a problem (stored in matrix) as cnf
             tmp.append(tmp2)
         indexBoard.append(tmp)
 
-    print indexBoard
+    # print indexBoard
 
     cnf = []
     
@@ -132,15 +134,18 @@ def encode_to_cnf(killerRules): #encode a problem (stored in matrix) as cnf
         # among the cells of the cage. 
 
         dic = {}
-        for nums in range(1, 10): 
-            dic[nums] = getNewIndex()
-
-        for num in common:
-            tmp = []
+        for num in range(1, 10): 
+            dic[num] = getNewIndex()
+            tmp =[]
             for cc in cageCells:
+                cnf.append([-1*indexBoard[cc[0]][cc[1]][num-1], dic[num]]) 
                 tmp.append(indexBoard[cc[0]][cc[1]][num-1])
-            print 'common value ', num, ' encoded as ', tmp 
+            tmp.append(-1* dic[num])
             cnf.append(tmp)
+
+
+        for num in common: 
+            cnf.append([dic[num]])
                 # cnf.append([-1* indexBoard[cc[0]][cc[1]][num-1], numIndex]) # if the number appears in one of the cells, then it makes the 
                                                                      # newly introduced literal true
 
@@ -244,6 +249,7 @@ def encode_to_cnf(killerRules): #encode a problem (stored in matrix) as cnf
 
                 
 def readSudoku(filename):
+    print 'the constraints from file ', filename, ' are:'
     file_reader = open(filename, 'r')
     lines = file_reader.readlines()
     killerRules = []
@@ -257,11 +263,28 @@ def readSudoku(filename):
         killerRules.append((int(s), lst))
     return killerRules
 
+def verify_killer_sudoku(killerRules, result_matrix):
+    print 'start checking the answer!'
+    for r in killerRules:
+        ans = r[0]
+        cage = r[1]
+        cageSum = 0
+        for c in cage:
+            cageSum = cageSum + result_matrix[c[0]][c[1]]
+        if cageSum != ans:
+            print 'the rule is not validated: ', r
+            return False
+    return True
+
+
 def main ():
     
     killerRules = readSudoku(sys.argv[1])
     
-    cnf =  encode_to_cnf(killerRules)             
+    cnf =  encode_to_cnf(killerRules)       
+    # for cn in cnf[0:50]:
+        # print cn
+
     write_to_cnf_file(cnf, sys.argv[1]+'.cnfx')
     
     # #solve the encoded CNF     
@@ -271,11 +294,16 @@ def main ():
     # print result_list
     
     if result_list !=[]:
-        print 'For a this killer sudoku, ',
+        print '\n\nFor a this killer sudoku, ',
         # print_matrix(matrix)
         result_matrix = decode_to_matrix(result_list)
-        print 'one of the solutions is\n'
+        print 'one of the solutions found is\n'
         print_matrix(result_matrix)
+
+        if (verify_killer_sudoku(killerRules, result_matrix)):
+            print 'yes, it is a valid answer!'
+        else:
+            print 'no, it is not a valid answer'
     else:
         print 'There is no solution for such a Sudoku'
               
