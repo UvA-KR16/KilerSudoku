@@ -253,7 +253,7 @@ def readSudoku(filename):
     file_reader = open(filename, 'r')
     lines = file_reader.readlines()
     killerRules = []
-    f = lambda x: [int(x[1]), int(x[3])] 
+    f = lambda x: [int(x[1]), int(x[4])] 
 
     for l in lines:
         print l
@@ -292,8 +292,9 @@ def main ():
     
     #output the result
     # print result_list
-    
-    if result_list !=[]:
+    if result_list == 'UNSAT':
+        print 'UNSAT'
+    elif result_list !=[]:
         print '\n\nFor a this killer sudoku, ',
         # print_matrix(matrix)
         result_matrix = decode_to_matrix(result_list)

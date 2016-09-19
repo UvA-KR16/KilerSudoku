@@ -159,7 +159,7 @@ def main ():
     matrix = read_as_matrix(sys.argv[1])
     
     cnf =  encode_to_cnf(matrix)             
-    write_to_cnf_file(cnf, sys.argv[1]+'.cnf')
+    # write_to_cnf_file(cnf, sys.argv[1]+'.cnf')
     
     #solve the encoded CNF     
     result_list = pycosat.solve(cnf)
