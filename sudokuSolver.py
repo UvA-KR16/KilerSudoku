@@ -83,7 +83,8 @@ def encode_to_cnf(matrix): #encode a problem (stored in matrix) as cnf
             #no more than one will be true
             for k in range(9):
                 for k2 in range (k+1, 9):
-                    cnf.append([-1*code(i,j,k), -1*code(i,j,k2)])
+                    cnf.append([-1*temp[k], -1*temp[k2]])
+                    # cnf.append([-1*code(i,j,k), -1*code(i,j,k2)])
                     #output.write('-'+str(code(i,j,k))+' -'+str(code(i,j, k2)) + ' 0\n') 
                     #print '\t (', k , ' and ', k2, 'are not the true at the same time for ', i, j , '\n'
             
@@ -102,7 +103,9 @@ def encode_to_cnf(matrix): #encode a problem (stored in matrix) as cnf
             #no more than once
             for i in range(9):
                 for i2 in range(i+1, 9):
-                    cnf.append([-1*code(i,j,k), -1*code(i2,j,k)])
+                    cnf.append([-1*temp[i], -1*temp[i2]])
+
+                    # cnf.append([-1*code(i,j,k), -1*code(i2,j,k)])
                     #output.write('-'+ str(code(i,j,k)) + ' -'+ str(code(i2,j,k)) + ' 0\n')
                     #print '\t for a number, row', i , ' and ', i2 ,' can not be true at the same time'      
             
@@ -118,7 +121,8 @@ def encode_to_cnf(matrix): #encode a problem (stored in matrix) as cnf
             for j in range(9):
                 for j2 in range( j +1, 9):
                     #output.write('-'+ str(code(i,j,k)) + ' -'+ str(code(i,j2,k)) + ' 0\n')
-                    cnf.append([-1*code(i,j,k), -1*code(i,j2,k)])
+                    cnf.append([-1*temp[j], -1*temp[j2]])
+                    # cnf.append([-1*code(i,j,k), -1*code(i,j2,k)])
                     
         #exactly once in each block
         for block_i in range(3):
@@ -135,10 +139,11 @@ def encode_to_cnf(matrix): #encode a problem (stored in matrix) as cnf
                 #no more than once
                 for index1 in range(0,9):
                     for index2 in range(index1+1, 9):
+                        cnf.append([-1*temp[index1], -1*temp[index2]])
                         #output.write('-'+str(code(index1%3+(block_i*3), index1/3+(block_j*3),k))+' -'
                         #             + str(code(index2%3+(block_i*3), index2/3+(block_j*3),k))+' 0\n')
-                        cnf.append([-1*(code(index1%3+(block_i*3), index1/3+(block_j*3),k)), 
-                                    -1*code(index2%3+(block_i*3), index2/3+(block_j*3),k)])#
+                        # cnf.append([-1*(code(index1%3+(block_i*3), index1/3+(block_j*3),k)), 
+                                    # -1*code(index2%3+(block_i*3), index2/3+(block_j*3),k)])#
                 
     # '''               
     #some numbers are prefilled
