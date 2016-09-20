@@ -5,6 +5,7 @@
 import os, sys
 import pyparsing as pp
 import numpy
+import time
 import pycosat
 from itertools import combinations, ifilter, chain
 
@@ -76,7 +77,38 @@ def add_cell_values(i, j, v):
     if not (v in cellPossibleValues[i][j]):
             cellPossibleValues[i][j].append(v)
 
-
+def exactly_one(literals):
+    # print 'exactly one of ', literals
+    new = []
+    cnf = []
+    previous= None
+    if len(literals) == 1:
+        cnf.append([literals[0]])
+    elif len(literals) == 2:
+        # cnf.append([literals[0], literals[1]])
+        cnf.append([literals[0] * -1, literals[1] * -1])
+    else:
+        for x in literals[:-2]:
+            # print 'x is ', x
+            y = getNewIndex()
+            # print 'y is ', y
+            # cnf.append([x, y])
+            cnf.append([-1*x, -1*y])
+            # print 'x only one y'
+            if len(new) != 0:
+                # print 'link to the previous x and y'
+                cnf.append([x * -1, new[-1]])
+                # print [x * -1, new[-1]]
+                cnf.append([y * -1, new[-1]])
+                # print [y * -1, new[-1]]
+            new.append(y)
+            previous = x
+        # cnf.append([literals[-1], literals[-2]])
+        cnf.append([-1*literals[-1], -1*literals[-2]])
+        cnf.append([-1*literals[-1], new[-1]])
+        cnf.append([-1*literals[-2], new[-1]])
+    cnf.append(literals)
+    return cnf
 
 
 def encode_to_cnf(killerRules): #encode a problem (stored in matrix) as cnf
@@ -125,11 +157,11 @@ def encode_to_cnf(killerRules): #encode a problem (stored in matrix) as cnf
             if (pl != []):
                 different.append(pl)
 
-        print 'In this iteration, we have the sum of cage: ', cageSum, '; the size of cage', cageSize
-        print 'these cells are: ', cageCells
-        print 'possible combinations are: ', allPossible
-        print 'common values, ' , common
-        print 'different values', different
+        # print 'In this iteration, we have the sum of cage: ', cageSum, '; the size of cage', cageSize
+        # print 'these cells are: ', cageCells
+        # print 'possible combinations are: ', allPossible
+        # print 'common values, ' , common
+        # print 'different values', different
 
         # next we start to encode. 
 
@@ -166,16 +198,16 @@ def encode_to_cnf(killerRules): #encode a problem (stored in matrix) as cnf
             # x -> 3 4 8
             for d in dif:
                 cnf.append([-1* x , dic[d]])
-                print ' for ', d, ' -- ', dic[d]
+                # print ' for ', d, ' -- ', dic[d]
             # ~(3, 4, 8) \/ x
             # i.e. -3 \/ -4 \/ -8 \/ x
             tmp = map ((lambda x : -1 * dic[x]), dif)
             tmp.append(x)  
-            print ' == ', tmp 
+            # print ' == ', tmp 
             cnf.append(tmp)
             x_list.append(x)
         if x_list != []:
-            print '***************', x_list
+            # print '***************', x_list
             cnf.append(x_list)
     # END of killer sudoku ------------------------
 
@@ -188,12 +220,13 @@ def encode_to_cnf(killerRules): #encode a problem (stored in matrix) as cnf
             for k in range(1,10):
                 temp.append(getIndex(i,j,k))
                 #output.write(str(code(i,j,k)) + ' ') 
-            cnf.append(temp)
+            # cnf.append(temp)
+            cnf = cnf + exactly_one(temp)
             #print 'not two numbers at the same time \n'
             #no more than one will be true
-            for k in range(1,10):
-                for k2 in range (k+1, 10):
-                    cnf.append([-1*getIndex(i,j,k), -1*getIndex(i,j,k2)])
+            # for k in range(1,10):
+            #     for k2 in range (k+1, 10):
+            #         cnf.append([-1*getIndex(i,j,k), -1*getIndex(i,j,k2)])
                     #output.write('-'+str(code(i,j,k))+' -'+str(code(i,j, k2)) + ' 0\n') 
                     #print '\t (', k , ' and ', k2, 'are not the true at the same time for ', i, j , '\n'
             
@@ -208,11 +241,11 @@ def encode_to_cnf(killerRules): #encode a problem (stored in matrix) as cnf
                 temp.append(getIndex(i,j,k))
                 #output.write(str(code(i,j,k)) + ' ')
             #output.write('0\n')
-            cnf.append(temp)
+            cnf = cnf + exactly_one(temp)
             #no more than once
-            for i in range(9):
-                for i2 in range(i+1, 9):
-                    cnf.append([-1*temp[i], -1*temp[i2]])
+            # for i in range(9):
+            #     for i2 in range(i+1, 9):
+            #         cnf.append([-1*temp[i], -1*temp[i2]])
                     # cnf.append([-1*getIndex(i,j,k), -1*getIndex(i2,j,k)])
                     #output.write('-'+ str(code(i,j,k)) + ' -'+ str(code(i2,j,k)) + ' 0\n')
                     #print '\t for a number, row', i , ' and ', i2 ,' can not be true at the same time'      
@@ -224,13 +257,14 @@ def encode_to_cnf(killerRules): #encode a problem (stored in matrix) as cnf
                 temp.append(getIndex(i,j,k))
                 #output.write(str(code(i,j,k)) + ' ')
             #output.write('0\n')
-            cnf.append(temp)
+            # cnf.append(temp)
+            cnf = cnf + exactly_one(temp)
             #no more than once
-            for j in range(9):
-                for j2 in range( j +1, 9):
-                    #output.write('-'+ str(code(i,j,k)) + ' -'+ str(code(i,j2,k)) + ' 0\n')
-                    # cnf.append([-1*getIndex(i,j,k), -1*getIndex(i,j2,k)])
-                    cnf.append([-1*temp[j], -1*temp[j2]])
+            # for j in range(9):
+            #     for j2 in range( j +1, 9):
+            #         #output.write('-'+ str(code(i,j,k)) + ' -'+ str(code(i,j2,k)) + ' 0\n')
+            #         # cnf.append([-1*getIndex(i,j,k), -1*getIndex(i,j2,k)])
+            #         cnf.append([-1*temp[j], -1*temp[j2]])
                     # print ' ',
                     
         #exactly once in each block
@@ -245,13 +279,14 @@ def encode_to_cnf(killerRules): #encode a problem (stored in matrix) as cnf
                         # print i, j, k , '<-------------'
                         #output.write(str(code(i,j,k)) + ' ')
                 #output.write('0\n')
-                cnf.append(temp)
+                # cnf.append(temp)
+                cnf = cnf + exactly_one(temp)
                 # print temp
                 #no more than once
-                for index1 in range(0,9):
-                    for index2 in range(index1+1, 9):
-                        # print ' ',
-                        cnf.append([-1*temp[index1], -1*temp[index2]])
+                # for index1 in range(0,9):
+                #     for index2 in range(index1+1, 9):
+                #         # print ' ',
+                #         cnf.append([-1*temp[index1], -1*temp[index2]])
                         #output.write('-'+str(code(index1%3+(block_i*3), index1/3+(block_j*3),k))+' -'
                         #             + str(code(index2%3+(block_i*3), index2/3+(block_j*3),k))+' 0\n')
                         # cnf.append([-1*(getIndex(index1%3+(block_i*3), index1/3+(block_j*3),k)), 
@@ -260,14 +295,14 @@ def encode_to_cnf(killerRules): #encode a problem (stored in matrix) as cnf
 
                 
 def readSudoku(filename):
-    print 'the constraints from file ', filename, ' are:'
+    # print 'the constraints from file ', filename, ' are:'
     file_reader = open(filename, 'r')
     lines = file_reader.readlines()
     killerRules = []
-    f = lambda x: [int(x[1]), int(x[3])] 
+    f = lambda x: [int(x[1]), int(x[4])] 
 
     for l in lines:
-        print l
+        # print l
         (s, t) = l.split('=')
         tl = t.split('+')
         lst = map(f, tl)
@@ -275,7 +310,7 @@ def readSudoku(filename):
     return killerRules
 
 def verify_killer_sudoku(killerRules, result_matrix):
-    print 'start checking the answer!'
+    # print 'start checking the answer!'
     for r in killerRules:
         ans = r[0]
         cage = r[1]
@@ -283,7 +318,7 @@ def verify_killer_sudoku(killerRules, result_matrix):
         for c in cage:
             cageSum = cageSum + result_matrix[c[0]][c[1]]
         if cageSum != ans:
-            print 'the rule is not validated: ', r
+            # print 'the rule is not validated: ', r
             return False
     return True
 
@@ -300,25 +335,28 @@ def main ():
     # write_to_cnf_file(cnf, sys.argv[1]+'.cnfx')
     
     # #solve the encoded CNF     
+    start = time.time()
     result_list = pycosat.solve(cnf)
-    
+    end = time.time()
     #output the result
     # print result_list
     if result_list == 'UNSAT':
         print 'UNSAT'
     elif result_list !=[]:
-        print '\n\nFor a this killer sudoku, ',
+        # print '\n\nFor a this killer sudoku, ',
         # print_matrix(matrix)
         result_matrix = decode_to_matrix(result_list)
-        print 'one of the solutions found is\n'
+        # print 'one of the solutions found is\n'
         print_matrix(result_matrix)
 
         if (verify_killer_sudoku(killerRules, result_matrix)):
-            print 'yes, it is a valid answer!'
+            # print 'yes, it is a valid answer!'
+            print 'CORRECT %04.5f'% (end-start) 
         else:
-            print 'no, it is not a valid answer'
+            print 'ERROR'
+            # print 'no, it is not a valid answer'
     else:
-        print 'There is no solution for such a Sudoku'
+        print 'SYSTEM ERROR'
               
 if __name__ == '__main__':
     main()

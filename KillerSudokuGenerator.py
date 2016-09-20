@@ -151,7 +151,7 @@ def generateKillerSudoku(sudoku,index,max_cage_choice):
         for a in not_included:
     #         print "a=",a
             not_included.remove(a)
-            if c_index<5:    # reduce c_index if you want less unit cages
+            if c_index<5:    # reduce c_index if you want less unit cages # TODO, what is this?
                 x = cage(max_cage_choice,a)
                 cage_list.append(x)
                 create_cage(a,max_cage_choice,cage_list,max_cage_choice)

@@ -13,8 +13,8 @@ def code(i,j,k):
 
 def decode_to_matrix(result_list):
     out_matrix = numpy.zeros(shape = (9,9))
-    for l in result_list:
-        if l > 0:
+    for l in result_list :
+        if l > 0 and l < 10000:
             #print l ,'means', (l-1)/81,((l-1)/9)%9,' is ', (l-1)%9 +1 
             out_matrix[(l-1)/81][((l-1)/9)%9] = (l-1)%9 +1
             
@@ -37,6 +37,49 @@ def count_matrix(m):
                 count = count +1
     return count
 '''
+
+seed = 10000
+indexBoard = []
+
+def getNewIndex():
+    global seed
+    seed = seed + 1
+    return seed
+
+
+
+def exactly_one(literals):
+    # print 'exactly one of ', literals
+    new = []
+    cnf = []
+    previous= None
+    if len(literals) == 1:
+        cnf.append([literals[0]])
+    elif len(literals) == 2:
+        # cnf.append([literals[0], literals[1]])
+        cnf.append([literals[0] * -1, literals[1] * -1])
+    else:
+        for x in literals[:-2]:
+            # print 'x is ', x
+            y = getNewIndex()
+            # print 'y is ', y
+            # cnf.append([x, y])
+            cnf.append([-1*x, -1*y])
+            # print 'x only one y'
+            if len(new) != 0:
+                # print 'link to the previous x and y'
+                cnf.append([x * -1, new[-1]])
+                # print [x * -1, new[-1]]
+                cnf.append([y * -1, new[-1]])
+                # print [y * -1, new[-1]]
+            new.append(y)
+            previous = x
+        # cnf.append([literals[-1], literals[-2]])
+        cnf.append([-1*literals[-1], -1*literals[-2]])
+        cnf.append([-1*literals[-1], new[-1]])
+        cnf.append([-1*literals[-2], new[-1]])
+    return cnf
+
             
 def write_to_cnf_file(cnf, name): # out is the writting channel
     out = open(name, 'w+')
@@ -78,12 +121,13 @@ def encode_to_cnf(matrix): #encode a problem (stored in matrix) as cnf
             for k in range(9):
                 temp.append(code(i,j,k))
                 #output.write(str(code(i,j,k)) + ' ') 
-            cnf.append(temp)
+            # cnf.append(temp)
+            cnf = cnf + exactly_one(temp)
             #print 'not two numbers at the same time \n'
             #no more than one will be true
-            for k in range(9):
-                for k2 in range (k+1, 9):
-                    cnf.append([-1*temp[k], -1*temp[k2]])
+            # for k in range(9):
+            #     for k2 in range (k+1, 9):
+            #         cnf.append([-1*temp[k], -1*temp[k2]])
                     # cnf.append([-1*code(i,j,k), -1*code(i,j,k2)])
                     #output.write('-'+str(code(i,j,k))+' -'+str(code(i,j, k2)) + ' 0\n') 
                     #print '\t (', k , ' and ', k2, 'are not the true at the same time for ', i, j , '\n'
@@ -101,9 +145,12 @@ def encode_to_cnf(matrix): #encode a problem (stored in matrix) as cnf
             #output.write('0\n')
             cnf.append(temp)
             #no more than once
-            for i in range(9):
-                for i2 in range(i+1, 9):
-                    cnf.append([-1*temp[i], -1*temp[i2]])
+            cnf = cnf + exactly_one(temp)
+            # print 'exactly one of ', temp
+            # print exactly_one(temp)
+            # for i in range(9):
+                # for i2 in range(i+1, 9):
+                    # cnf.append([-1*temp[i], -1*temp[i2]])
 
                     # cnf.append([-1*code(i,j,k), -1*code(i2,j,k)])
                     #output.write('-'+ str(code(i,j,k)) + ' -'+ str(code(i2,j,k)) + ' 0\n')
@@ -116,12 +163,13 @@ def encode_to_cnf(matrix): #encode a problem (stored in matrix) as cnf
                 temp.append(code(i,j,k))
                 #output.write(str(code(i,j,k)) + ' ')
             #output.write('0\n')
-            cnf.append(temp)
-            #no more than once
-            for j in range(9):
-                for j2 in range( j +1, 9):
-                    #output.write('-'+ str(code(i,j,k)) + ' -'+ str(code(i,j2,k)) + ' 0\n')
-                    cnf.append([-1*temp[j], -1*temp[j2]])
+            cnf = cnf + exactly_one(temp)
+            # cnf.append(temp)
+            # #no more than once
+            # for j in range(9):
+            #     for j2 in range( j +1, 9):
+            #         #output.write('-'+ str(code(i,j,k)) + ' -'+ str(code(i,j2,k)) + ' 0\n')
+            #         cnf.append([-1*temp[j], -1*temp[j2]])
                     # cnf.append([-1*code(i,j,k), -1*code(i,j2,k)])
                     
         #exactly once in each block
@@ -135,11 +183,12 @@ def encode_to_cnf(matrix): #encode a problem (stored in matrix) as cnf
                         temp.append(code(i,j,k))
                         #output.write(str(code(i,j,k)) + ' ')
                 #output.write('0\n')
-                cnf.append(temp)
-                #no more than once
-                for index1 in range(0,9):
-                    for index2 in range(index1+1, 9):
-                        cnf.append([-1*temp[index1], -1*temp[index2]])
+                cnf = cnf + exactly_one(temp)
+                # cnf.append(temp)
+                # #no more than once
+                # for index1 in range(0,9):
+                #     for index2 in range(index1+1, 9):
+                #         cnf.append([-1*temp[index1], -1*temp[index2]])
                         #output.write('-'+str(code(index1%3+(block_i*3), index1/3+(block_j*3),k))+' -'
                         #             + str(code(index2%3+(block_i*3), index2/3+(block_j*3),k))+' 0\n')
                         # cnf.append([-1*(code(index1%3+(block_i*3), index1/3+(block_j*3),k)), 
@@ -170,9 +219,8 @@ def main ():
     result_list = pycosat.solve(cnf)
     
     #output the result
-    #print result_list
     
-    if result_list !=[]:
+    if result_list !=[] and result_list != 'UNSAT':
         
         print 'For a Sudoku problem like this:\n'
         print_matrix(matrix)
@@ -181,6 +229,7 @@ def main ():
         print 'One of the solution is\n'
         print_matrix(result_matrix)
     else:
+        print result_list
         print 'There is no solution for such a Sudoku'
               
 if __name__ == '__main__':
