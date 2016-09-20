@@ -17,6 +17,9 @@ sudoku = [8,3,4,1,7,5,9,2,6,1,6,2,3,9,4,7,8,5,7,9,5,6,2,8,4,3,1,2,7,6,5,4,9,8,1,
 
 sudoku1 = map(int,list("123456789578139624496872153952381467641297835387564291719623548864915372235748916"))
 
+not_included = []
+cells = {}
+Scells = {}
 
 # In[138]:
 
@@ -28,11 +31,13 @@ def readSudokus(filename):
     # print type(content)
     Sudoku = []
     for i in content:
-#         try:
-        Sudoku.append(map(int,list(i[:-1])))
-#         except ValueError:
-#             pass
-#             print i
+        # try:
+        # print i
+        # print '>'+i[-2]+'<'
+        Sudoku.append(map(int,list(i[:-2])))
+        # except ValueError:
+            # pass
+            # print i
     return Sudoku
 
 
@@ -54,6 +59,7 @@ def verify(cage_list):
 # In[148]:
 
 def get_neighbours(a,values_list):
+    global not_included
     cell = a
 #     print cell
     neighbours = []
@@ -75,6 +81,7 @@ def get_neighbours(a,values_list):
 
 
 def create_cage(a,cage_choice,cage_list,max_cage_choice):
+    global cells
     req_cage = cage_list[-1]
     values_list = [i for i in range(1,10)]
     for i in range(cage_choice-1):
@@ -124,6 +131,8 @@ class cage:
         return sum([cells[i] for i  in self.cells])
     
 def generateKillerSudoku(sudoku,index,max_cage_choice):
+    global cells
+    global Scells
     Scells = []
     for i in range(9):
         for j in range(9):
@@ -155,11 +164,11 @@ def generateKillerSudoku(sudoku,index,max_cage_choice):
         random.shuffle(not_included)
     verify(cage_list)
 #     print not_included
-    save_path = "F:/UvA/KRProject_1/"+ str(max_cage_choice)+str('/') 
+    save_path = "/home/airobert/Project/KRproject1/"+ str(max_cage_choice)+str('/') 
 #     save_path = ''
     out = str(index)+".killer"
     output_filename = os.path.join(save_path,out)
-    f1 = open(output_filename,'w')
+    f1 = open(output_filename,'w+')
     for cage1 in cage_list:
             outputString = ''
             outputString = str(cage1.sum())+"="
@@ -175,62 +184,14 @@ def outputKillerSudoku(filename,max_cage_choice):
     Sudokus = readSudokus(filename)
     killerSudokus = []
     index = 0
-    for s in Sudokus:
+    for s in Sudokus[:100]:
         generateKillerSudoku(s,index,max_cage_choice)
         index += 1
 
 # save_path = 'F:\UvA\KRProject_1'
 for i in [2,3,4,5,6,7,8,9]:
+    print i
     outputKillerSudoku("Sudokus.txt",i)
 # generateKillerSudoku(sudoku,1,3)
 # outputKillerSudoku("Sudokus.txt",2)
-
-
-# In[126]:
-
-# import collections
-# com_list = []
-# for cage in cage_list:
-# #     print [item for item, count in collections.Counter(cage.cells).items() if count > 1]
-#     print cage.choice,cage.size(),cage.sum(),cage.cells
-# #     if cage.size()>1:
-# #         com_list += cage.cells
-# # if set(com_list) == set(Scells):
-# #      print True
-# # print len(com_list),len(Scells)
-# # print com_list
-# # print [item for item, count in collections.Counter(com_list).items() if count > 1]
-
-
-# In[27]:
-
-# print not_included,len(not_included)
-
-
-# In[17]:
-
-# j=0
-# temp = []
-# for i in sudoku:
-#     j+=1
-#     temp.append(i)
-#     if j == 9:
-#         print temp
-#         temp=[]
-#         j=0
-
-
-# In[81]:
-
-# range(2,6)
-
-
-# In[147]:
-
-# print k
-
-
-# In[ ]:
-
-
 
