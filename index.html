@@ -24,13 +24,22 @@
 
 <p>Killer Sudoku is a special class of sudoku where the sum of some adjacent cells is given. The goal is to fill in every cell with 1 to 9 and make sum equals to the sum as specified. This case study presents the first attempt using SAT solver for Killer Sudoku problems. This approach follows from that of classical sudokus. In addition, we generated the first opensource killer sudokus database.</p>
 
-<h3>
-<a id="creating-pages-manually" class="anchor" href="#creating-pages-manually" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Creating pages manually</h3>
+<!-- <h2>Spectacular Mountain</h3> -->
+<img src="killer.png" alt="Mountain View" style="width:400px;height:400px;">
 
-<p>This project employed PycoSAT as the SAT solver. By interacting with its Python API. It takes less than one second to obtain a solution for any killer sudoku problem.</p>
 
 <h3>
-<a id="authors-and-contributors" class="anchor" href="#authors-and-contributors" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Authors and Contributors</h3>
+<a id="creating-pages-manually" class="anchor" href="#creating-pages-manually" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>The Solver, Encoding and Performance</h3>
+
+<p>This project employed PycoSAT as the SAT solver. By interacting with its Python API, it took less than one second to obtain a solution for any killer sudoku problem. Details about encoding is described in this short paper <a href="./paper.pdf">download</a>.</p>
+
+<h3>
+<a id="creating-pages-manually" class="anchor" href="#creating-pages-manually" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>A Killer Sudoku Database</h3>
+
+<p>We also provide a opensource database. There are 1000 example killer sudokus and their answers in the /data directory.</p>
+
+<h3>
+<a id="authors-and-contributors" class="anchor" href="#authors-and-contributors" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Authors</h3>
 
 <p>The project was developed by Robert (<a href="https://github.com/airobert" class="user-mention">@airobert</a>) and Aashish (<a href="https://github.com/AashishV" class="user-mention">@AashishV</a>).</p>
 
