@@ -14,6 +14,9 @@ from itertools import combinations, ifilter, chain
 seed = 10000
 indexBoard = []
 
+countCNF_ari = 0
+countCNF_all = 0
+
 def getNewIndex():
     global seed
     seed = seed + 1
@@ -113,6 +116,8 @@ def exactly_one(literals):
 
 def encode_to_cnf(killerRules): #encode a problem (stored in matrix) as cnf
     global indexBoard
+    global countCNF_all
+    global countCNF_ari
     for i in range (0, 9):
         tmp = []
         for j in range (0, 9):
@@ -210,6 +215,7 @@ def encode_to_cnf(killerRules): #encode a problem (stored in matrix) as cnf
             # print '***************', x_list
             cnf.append(x_list)
     # END of killer sudoku ------------------------
+    countCNF_ari = len(cnf)
 
     # Exactly one in each cell
     for i in range(9): #column
@@ -291,6 +297,7 @@ def encode_to_cnf(killerRules): #encode a problem (stored in matrix) as cnf
                         #             + str(code(index2%3+(block_i*3), index2/3+(block_j*3),k))+' 0\n')
                         # cnf.append([-1*(getIndex(index1%3+(block_i*3), index1/3+(block_j*3),k)), 
                                     # -1*getIndex(index2%3+(block_i*3), index2/3+(block_j*3),k)])#
+    countCNF_all = len(cnf)
     return cnf
 
                 
@@ -347,11 +354,11 @@ def main ():
         # print_matrix(matrix)
         result_matrix = decode_to_matrix(result_list)
         # print 'one of the solutions found is\n'
-        print_matrix(result_matrix)
+        # print_matrix(result_matrix)
 
         if (verify_killer_sudoku(killerRules, result_matrix)):
             # print 'yes, it is a valid answer!'
-            print 'CORRECT %04.5f'% (end-start) 
+            print 'CORRECT %04.5f %d %d'% ((end-start), countCNF_ari, countCNF_all)
         else:
             print 'ERROR'
             # print 'no, it is not a valid answer'

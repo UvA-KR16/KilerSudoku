@@ -28,6 +28,8 @@ for folder in range(2, 10):
   ptime = 0
   fsize = 0
   solvingTime = 0
+  countAri = 0
+  countAll = 0
   ct = 0
   for file in range(amount):
     # ct = ct + 1
@@ -49,11 +51,16 @@ for folder in range(2, 10):
       print 'fail'
     elif result[0:7] != 'CORRECT':
       print 'error'
+      print result 
       # print("%-*s  %10d  FAIL" % (width, name, size))
     else: 
       # print result 
-      solvingTime = solvingTime + float(result[7:])
+      r = result.split(' ')
+      solvingTime = solvingTime + float(r[1])
+      countAri = countAri + int(r[2])
+      countAll = countAll + int(r[3])
     
-  print("total time for cage size %d is = %04.4f, among which, the solving time is %04.4f" % (folder, ptime/amount, solvingTime/amount))
+  print "total time for cage size %d is = %04.4f, among which, the solving time is %04.4f" % (folder, ptime/amount, solvingTime/amount)
+  print 'they have an avg. no. arith clauses of ', countAri/amount, '  and a total of ', countAll/amount
   # print("total art file size = %10d" % (fsize))
   # print("in total %10d files" % ct);
