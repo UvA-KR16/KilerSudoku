@@ -10,7 +10,6 @@ import pycosat
 from itertools import combinations, ifilter, chain
 
 # some global values:
-# cellPossibleValues = [[range(1,10)] * 9]  *9
 seed = 10000
 indexBoard = []
 
@@ -59,14 +58,9 @@ def print_matrix(matrix):
             
 def write_to_cnf_file(cnf, name): # out is the writting channel
     out = open(name, 'w+')
-    # out.write("c created by Robert for iLogic course and final year project. \nc Supervisor: Dr. Konstantin Korovin")
-    #out.write() we can forget about the number of clauses and number of variables although it is good to know.
-    #print "data is", repr(cnf)
     
     for clause in cnf:
-        # print 'A Clause is: ', clause
         for literal in clause:
-            #print literal
             out.write(str(literal)+' ')
     out.write('\n')
     out.close() 
@@ -126,8 +120,6 @@ def encode_to_cnf(killerRules): #encode a problem (stored in matrix) as cnf
                 tmp2.append(getIndex(i, j, num))
             tmp.append(tmp2)
         indexBoard.append(tmp)
-
-    # print indexBoard
 
     cnf = []
     
@@ -225,16 +217,7 @@ def encode_to_cnf(killerRules): #encode a problem (stored in matrix) as cnf
             temp =[]
             for k in range(1,10):
                 temp.append(getIndex(i,j,k))
-                #output.write(str(code(i,j,k)) + ' ') 
-            # cnf.append(temp)
             cnf = cnf + exactly_one(temp)
-            #print 'not two numbers at the same time \n'
-            #no more than one will be true
-            # for k in range(1,10):
-            #     for k2 in range (k+1, 10):
-            #         cnf.append([-1*getIndex(i,j,k), -1*getIndex(i,j,k2)])
-                    #output.write('-'+str(code(i,j,k))+' -'+str(code(i,j, k2)) + ' 0\n') 
-                    #print '\t (', k , ' and ', k2, 'are not the true at the same time for ', i, j , '\n'
             
     #exactly once in each row     
     for k in range(1,10): #each number
@@ -245,34 +228,14 @@ def encode_to_cnf(killerRules): #encode a problem (stored in matrix) as cnf
             temp = []
             for i in range(9):
                 temp.append(getIndex(i,j,k))
-                #output.write(str(code(i,j,k)) + ' ')
-            #output.write('0\n')
             cnf = cnf + exactly_one(temp)
-            #no more than once
-            # for i in range(9):
-            #     for i2 in range(i+1, 9):
-            #         cnf.append([-1*temp[i], -1*temp[i2]])
-                    # cnf.append([-1*getIndex(i,j,k), -1*getIndex(i2,j,k)])
-                    #output.write('-'+ str(code(i,j,k)) + ' -'+ str(code(i2,j,k)) + ' 0\n')
-                    #print '\t for a number, row', i , ' and ', i2 ,' can not be true at the same time'      
             
         #exactly once in each coloumn
         for i in range(9):
             temp = []
             for j in range(9):
                 temp.append(getIndex(i,j,k))
-                #output.write(str(code(i,j,k)) + ' ')
-            #output.write('0\n')
-            # cnf.append(temp)
             cnf = cnf + exactly_one(temp)
-            #no more than once
-            # for j in range(9):
-            #     for j2 in range( j +1, 9):
-            #         #output.write('-'+ str(code(i,j,k)) + ' -'+ str(code(i,j2,k)) + ' 0\n')
-            #         # cnf.append([-1*getIndex(i,j,k), -1*getIndex(i,j2,k)])
-            #         cnf.append([-1*temp[j], -1*temp[j2]])
-                    # print ' ',
-                    
         #exactly once in each block
         for block_i in range(3):
             for block_j in range(3):
@@ -282,21 +245,7 @@ def encode_to_cnf(killerRules): #encode a problem (stored in matrix) as cnf
                 for i in range(block_i*3, block_i*3 + 3):
                     for j in range(block_j*3, block_j*3 + 3):
                         temp.append(getIndex(i,j,k))
-                        # print i, j, k , '<-------------'
-                        #output.write(str(code(i,j,k)) + ' ')
-                #output.write('0\n')
-                # cnf.append(temp)
                 cnf = cnf + exactly_one(temp)
-                # print temp
-                #no more than once
-                # for index1 in range(0,9):
-                #     for index2 in range(index1+1, 9):
-                #         # print ' ',
-                #         cnf.append([-1*temp[index1], -1*temp[index2]])
-                        #output.write('-'+str(code(index1%3+(block_i*3), index1/3+(block_j*3),k))+' -'
-                        #             + str(code(index2%3+(block_i*3), index2/3+(block_j*3),k))+' 0\n')
-                        # cnf.append([-1*(getIndex(index1%3+(block_i*3), index1/3+(block_j*3),k)), 
-                                    # -1*getIndex(index2%3+(block_i*3), index2/3+(block_j*3),k)])#
     countCNF_all = len(cnf)
     return cnf
 
@@ -336,11 +285,6 @@ def main ():
     killerRules = readSudoku(sys.argv[1])
     
     cnf =  encode_to_cnf(killerRules)       
-    # for cn in cnf[0:1000]:
-        # print cn
-
-    # write_to_cnf_file(cnf, sys.argv[1]+'.cnfx')
-    
     # #solve the encoded CNF     
     start = time.time()
     result_list = pycosat.solve(cnf)
@@ -353,6 +297,7 @@ def main ():
         # print '\n\nFor a this killer sudoku, ',
         # print_matrix(matrix)
         result_matrix = decode_to_matrix(result_list)
+        # uncomment these two lines if you want to print the sudoku 
         # print 'one of the solutions found is\n'
         # print_matrix(result_matrix)
 
